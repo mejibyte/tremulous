@@ -368,6 +368,7 @@ else # ifeq Linux
 ifeq ($(PLATFORM),darwin)
   HAVE_VM_COMPILED=true
   LIBS = -framework Cocoa
+  TOOLS_LIBS=
   CLIENT_LIBS=
   OPTIMIZEVM=
 
@@ -1100,13 +1101,14 @@ TOOLS_CFLAGS += $(TOOLS_OPTIMIZE) \
 TOOLS_LIBS =
 TOOLS_LDFLAGS =
 
+
 ifeq ($(GENERATE_DEPENDENCIES),1)
 	TOOLS_CFLAGS += -MMD
 endif
 
 define DO_TOOLS_CC
 $(echo_cmd) "TOOLS_CC $<"
-$(Q)$(CC) $(TOOLS_CFLAGS) -o $@ -c $<
+$(Q)$(CC) $(NOTSHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(TOOLS_CFLAGS) -o $@ -c $<
 endef
 
 define DO_TOOLS_CC_DAGCHECK
@@ -1205,7 +1207,9 @@ $(B)/tools/etc/%.o: $(Q3LCCETCDIR)/%.c
 
 $(Q3LCC): $(Q3LCCOBJ) $(Q3RCC) $(Q3CPP)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $(Q3LCCOBJ) $(TOOLS_LIBS)
+	# Andy Print linker flags
+	$(echo_cmd) "$(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3LCCOBJ) $(LIBS) $(TOOLS_LIBS)"
+	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3LCCOBJ) $(LIBS) $(TOOLS_LIBS)
 
 define DO_Q3LCC
 $(echo_cmd) "Q3LCC $<"
@@ -1635,6 +1639,8 @@ endif
 
 $(B)/tremded$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
+	## Andy: print linker flags
+	$(echo_cmd) "$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
 
 

@@ -1,0 +1,1 @@
+CC=gcc-4.0 CFLAGS='-isysroot /Developer/SDKs/MacOSX10.6.sdk' TOOLS_CFLAGS='-isysroot /Developer/SDKs/MacOSX10.6.sdk' make
